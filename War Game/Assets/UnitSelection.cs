@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class UnitSelection : MonoBehaviour {
 
@@ -36,6 +37,20 @@ public class UnitSelection : MonoBehaviour {
 			else
 			{
 				Deselect();
+			}
+		}
+		if (Input.GetMouseButtonUp(1) && Selected.Count > 0)
+		{
+			RaycastHit hitInfo;
+			bool hit = Physics.Raycast(Cam.ScreenPointToRay(Input.mousePosition), out hitInfo);
+
+			if (hit)
+			{
+				foreach (var item in Selected)
+				{
+					NavMeshAgent agent = item.GetComponent<NavMeshAgent>();
+					agent.destination = hitInfo.point;
+				}
 			}
 		}
 	}
