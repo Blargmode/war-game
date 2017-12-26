@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour {
 
+    public bool enableMousePanning = true;
 	public float panSpeed = 40f;
 	public float panBorderThickness = 10f;
 	public Vector2 panLimits;
@@ -17,19 +18,19 @@ public class CameraController : MonoBehaviour {
 		Vector3 pos = transform.position;
 
 		//Pan
-		if (Input.GetKey("w") || Input.mousePosition.y >= Screen.height - panBorderThickness)
+		if (Input.GetKey("w") || (enableMousePanning && Input.mousePosition.y >= Screen.height - panBorderThickness))
 		{
 			pos.z += panSpeed * Time.deltaTime;
 		}
-		else if (Input.GetKey("s") || Input.mousePosition.y <= panBorderThickness)
+		else if (Input.GetKey("s") || (enableMousePanning && Input.mousePosition.y <= panBorderThickness))
 		{
 			pos.z -= panSpeed * Time.deltaTime;
 		}
-		else if(Input.GetKey("d") || Input.mousePosition.x >= Screen.width - panBorderThickness)
+		else if(Input.GetKey("d") || (enableMousePanning && Input.mousePosition.x >= Screen.width - panBorderThickness))
 		{
 			pos.x += panSpeed * Time.deltaTime;
 		}
-		else if(Input.GetKey("a") || Input.mousePosition.x <= panBorderThickness)
+		else if(Input.GetKey("a") || (enableMousePanning && Input.mousePosition.x <= panBorderThickness))
 		{
 			pos.x -= panSpeed * Time.deltaTime;
 		}
