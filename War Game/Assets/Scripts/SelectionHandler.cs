@@ -13,30 +13,30 @@ public class SelectionHandler : MonoBehaviour {
 
 	Camera Cam;
 	public List<GameObject> Selected; //Public for debugging
-    
-    public LayerMask groundLayer;
-    public LayerMask selectableLayer;
+	
+	public LayerMask groundLayer;
+	public LayerMask selectableLayer;
 
-    LayerMask mask;
+	LayerMask mask;
 
 	// Use this for initialization
 	void Start () {
 		Cam = GetComponent<Camera>();
 		Selected = new List<GameObject>();
 
-        mask = groundLayer | selectableLayer;
+		mask = groundLayer | selectableLayer;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetMouseButtonUp(0))
 		{
-            //Left click
-            //For selecting selectables
+			//Left click
+			//For selecting selectables
 
 			RaycastHit hitInfo;
 			bool hit = Physics.Raycast(Cam.ScreenPointToRay(Input.mousePosition), out hitInfo, mask);
-            
+			
 			if (hit && HasTag(hitInfo.transform.tag, "Unit"))
 			{
 				if (Input.GetKey(KeyCode.LeftControl))
@@ -57,53 +57,48 @@ public class SelectionHandler : MonoBehaviour {
 		}
 		if (Input.GetMouseButtonUp(1) && Selected.Count > 0)
 		{
-            //Right click 
-            //For moving selected units or making them interact.
+			//Right click 
+			//For moving selected units or making them interact.
 
 			RaycastHit hitInfo;
 			bool hit = Physics.Raycast(Cam.ScreenPointToRay(Input.mousePosition), out hitInfo, 200, mask);
 
-            /*
-            //Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
+			/*
+			//Interactable interactable = hitInfo.collider.GetComponent<Interactable>();
 
-            if (interactable != null)
-            {
-
-            }
-            */
-
-            if (hit)
+			if (interactable != null)
 			{
-                if (hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Selectable"))
-                {
-                    foreach (var item in Selected)
-                    {
-                        Unit unit = item.GetComponent<Unit>();
-                        if (unit != null)
-                        {
-                            unit.SetTarget(hitInfo.transform);
-                        }
-                    }
-                }
-                else if (hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Ground"))
-                {
-                    foreach (var item in Selected)
-                    {
-                        Unit unit = item.GetComponent<Unit>();
-                        if (unit != null)
-                        {
-                            unit.SetDestination(hitInfo.point);
-                        }
-                    }
-                }
+
+			}
+			*/
+
+			if (hit)
+			{
+				if (hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Selectable"))
+				{
+					foreach (var item in Selected)
+					{
+						Unit unit = item.GetComponent<Unit>();
+						if (unit != null)
+						{
+							unit.SetTarget(hitInfo.transform);
+						}
+					}
+				}
+				else if (hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Ground"))
+				{
+					foreach (var item in Selected)
+					{
+						Unit unit = item.GetComponent<Unit>();
+						if (unit != null)
+						{
+							unit.SetDestination(hitInfo.point);
+						}
+					}
+				}
 			}
 		}
 	}
-
-    void SetFocus()
-    {
-
-    }
 
 	void Deselect()
 	{
