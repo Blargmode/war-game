@@ -102,6 +102,11 @@ public class SelectionHandler : MonoBehaviour {
 
 	void Deselect()
 	{
+
+		foreach (var item in Selected)
+		{
+			item.GetComponent<Unit>().SetSelected(false);
+		}
 		if (Selected.Count > 0) Selected.Clear();
 	}
 
@@ -110,6 +115,7 @@ public class SelectionHandler : MonoBehaviour {
 		if (!Selected.Contains(item))
 		{
 			Selected.Add(item);
+			item.GetComponent<Unit>().SetSelected(true);
 		}
 	}
 

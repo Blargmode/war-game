@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class Unit : MonoBehaviour {
-	
+
+	private bool selected = false;
 	public UnitType unitType = UnitType.Melee;
 	public float range = 1f;
 	public float health = 100f;
@@ -21,11 +23,33 @@ public class Unit : MonoBehaviour {
 	private Unit targetUnit;
 	NavMeshAgent agent;
 
+	public GameObject healthbar;
+	public float healthbarOffset = 2f;
+	Canvas healthbarCanvas;
+	Image healthbarValue;
+	private float healthbarSize = 0f;
+
 	// Use this for initialization
 	void Start () {
 		startHealth = health;
 		agent = transform.GetComponent<NavMeshAgent>();
+		healthbarCanvas = GameObject.Find("Healthbars Canvas").GetComponent<Canvas>();
+		healthbar = Instantiate(healthbar, healthbarCanvas.transform);
+		healthbar.SetActive(false);
+		healthbarSize = Camera.main.GetComponent<CameraController>().minY;
+		healthbarValue = healthbar.transform.GetChild(0).GetComponent<Image>();
 	}
+
+	void LateUpdate()
+	{
+		if (selected)
+		{
+			float distance = Vector3.Distance(Camera.main.transform.position, transform.position);
+			healthbar.transform.localScale = new Vector3((healthbarSize / distance), (healthbarSize / distance), healthbar.transform.localScale.z);
+			healthbar.transform.position = Camera.main.WorldToScreenPoint((Vector3.up * healthbarOffset) + transform.position);
+		}
+	}
+
 	
 	// PERFORMANCE NOTE
 	// In fixed update for now. Maybe reduce how often this happens even more.
@@ -71,7 +95,13 @@ public class Unit : MonoBehaviour {
 			interactionTimer = interactionCooldown;
 
 			if (unitType == UnitType.Melee)
-				targetUnit.TakeDamage(damage);
+			{
+				if (!targetUnit.TakeDamage(damage))
+				{
+					//If false, target can't take anymore damage a.k.a. dead
+					target = null;
+				}
+			}
 			else if (unitType == UnitType.Ranged)
 				Fire();
 		}
@@ -81,7 +111,12 @@ public class Unit : MonoBehaviour {
 	public bool TakeDamage(float amount)
 	{
 		health -= amount; //Mathf.Clamp(amount, 0, float.MaxValue); //prevents healing -- = +
-		if(health <= 0)
+
+		healthbarValue.fillAmount = health / startHealth;
+
+		Debug.Log("Health: " + healthbarValue.fillAmount);
+
+		if (health <= 0)
 		{
 			Die();
 			return false;
@@ -97,6 +132,7 @@ public class Unit : MonoBehaviour {
 
 	private void Die()
 	{
+		Destroy(healthbar);
 		Destroy(gameObject);
 	}
 
@@ -126,6 +162,12 @@ public class Unit : MonoBehaviour {
 			// Destroy the bullet after x seconds
 			Destroy(newProjectile, projectileDespawnDelay);
 		}
+	}
+
+	public void SetSelected(bool yes)
+	{
+		healthbar.SetActive(yes);
+		selected = yes;
 	}
 }
 
